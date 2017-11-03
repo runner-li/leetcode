@@ -1,0 +1,62 @@
+//https://leetcode.com/articles/maximum-sum-of-3-non-overlapping-intervals/
+// dynamic programming 
+class Solution 
+{
+public:
+    vector<int> maxSumOfThreeSubarrays(vector<int>& nums, int k)
+    {
+        vector<int> sums;
+        int len = nums.size();
+        int temp_sum = 0;
+        for (int j =0; j<k; j++)
+        {
+            temp_sum += nums[j];   
+        } 
+        sums.push_back(temp_sum);
+        for (int i=1; i<len-k+1; i++)
+        {
+            temp_sum = temp_sum - nums[i-1] + nums[i+k-1];
+            sums.push_back(temp_sum);
+        }
+        //sums index from 0 to len-k
+        
+        vector<int> res;
+        
+        int *left = new int[len];
+        int best = 0;
+        for (int i = 0; i <= (len-k); i++) 
+        {
+            if (sums[i] > sums[best])
+                best = i;
+            left[i] = best;
+        }
+        
+        int *right = new int[len];
+        best = len - k;
+        for (int i = len - k; i >= 0; i--) 
+        {
+            if (sums[i] >= sums[best]) // to Guranteen the lexicographically order
+                best = i;
+            right[i] = best;
+        }
+        
+        //initial sum of 3 subarray
+        res.push_back(0);
+        res.push_back(k);
+        res.push_back(2*k);
+        // suppose we fix the j the middle subarray string
+        for (int j = k; j <= (len - 2*k); j++) 
+        {
+            int i = left[j - k], z = right[j + k];
+            if ( (sums[i] + sums[j] + sums[z]) > (sums[res[0]] + sums[res[1]] + sums[res[2]]) ) 
+            {
+                res[0] = i;
+                res[1] = j;
+                res[2] = z;
+            }
+        }
+        delete [] right;
+        delete [] left;
+        return res;
+    }
+};
